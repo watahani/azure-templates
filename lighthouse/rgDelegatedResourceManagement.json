@@ -1,0 +1,118 @@
+
+{
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "mspOfferName": {
+            "type": "string",
+            "defaultValue": "Fabrikam Managed Services - Interstellar",
+            "metadata": {
+                "description": "委任先組織の名前"
+            }
+        },
+        "mspOfferDescription": {
+            "type": "string",
+            "defaultValue": "Fabrikam Managed Services - Interstellar",
+            "metadata": {
+                "description": "委任先組織の説明"
+            }
+        },
+        "managedByTenantId": {
+            "type": "string",
+            "metadata": {
+                "description": "委任先のテナント ID (GUID)"
+            }
+        },
+        "assignedRole": {
+            "type": "string",
+            "defaultValue": "b24988ac-6180-42a0-ab88-20f7382dd24c",
+            "metadata": {
+                "description": "割り当てる RBAC 権限の roleDefinitionId. Get-AzRoleDefinition コマンドで取得可能. デフォルト値は共同管理者 (b24988ac-6180-42a0-ab88-20f7382dd24c)"
+            }
+        },
+        "assigneeId": {
+            "type": "string",
+            "metadata": {
+                "description": "委任先グループ, もしくはユーザーのオブジェクト ID"
+            }
+        },
+        "asigneeDiplayName": {
+            "type": "string",
+            "defaultValue": "Tier 1 Support",
+            "metadata": {
+                "description": "委任先グループ、またはユーザーの表示名"
+            }
+        },
+        "rgName": {
+            "type": "string",
+            "metadata": {
+                "description": "委任するリソースグループ名 (委任元のサブスクリプションに事前作成します)"
+            }
+        }
+    },
+    "variables": {
+        "mspRegistrationName": "[guid(parameters('mspOfferName'))]",
+        "mspAssignmentName": "[guid(parameters('rgName'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.ManagedServices/registrationDefinitions",
+            "apiVersion": "2019-06-01",
+            "name": "[variables('mspRegistrationName')]",
+            "properties": {
+                "registrationDefinitionName": "[parameters('mspOfferName')]",
+                "description": "[parameters('mspOfferDescription')]",
+                "managedByTenantId": "[parameters('managedByTenantId')]",
+                "authorizations": {
+                    "principalId": "[parameters('assigneeId')]",
+                    "roleDefinitionId": "[parameters('assignedRole')]",
+                    "principalIdDisplayName": "[parameters('asigneeDiplayName')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2018-05-01",
+            "name": "rgAssignment",
+            "resourceGroup": "[parameters('rgName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ManagedServices/registrationDefinitions/', variables('mspRegistrationName'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                    },
+                    "resources": [
+                        {
+                            "type": "Microsoft.ManagedServices/registrationAssignments",
+                            "apiVersion": "2019-06-01",
+                            "name": "[variables('mspAssignmentName')]",
+                            "properties": {
+                                "registrationDefinitionId": "[resourceId('Microsoft.ManagedServices/registrationDefinitions/', variables('mspRegistrationName'))]"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "mspOfferName": {
+            "type": "string",
+            "value": "[concat('Managed by', ' ', parameters('mspOfferName'))]"
+        },
+        "authorizations": {
+            "type": "array",
+            "value": {
+                "authorizations": {
+                    "principalId": "[parameters('assigneeId')]",
+                    "roleDefinitionId": "[parameters('assignedRole')]",
+                    "principalIdDisplayName": "[parameters('asigneeDiplayName')]"
+                }
+            }
+        }
+    }
+}
