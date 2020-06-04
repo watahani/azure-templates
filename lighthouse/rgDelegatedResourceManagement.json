@@ -108,15 +108,13 @@
         },
         "authorizations": {
             "type": "array",
-            "value": {
-                "authorizations": [
-                    {
-                        "principalId": "[parameters('assigneeId')]",
-                        "roleDefinitionId": "[parameters('assignedRole')]",
-                        "principalIdDisplayName": "[parameters('asigneeDiplayName')]"
-                    }
-                ]
-            }
+            "value": [
+                {
+                    "principalId": "[parameters('assigneeId')]",
+                    "roleDefinitionId": "[parameters('assignedRole')]",
+                    "principalIdDisplayName": "[parameters('asigneeDiplayName')]"
+                }
+            ]
         }
     }
 }
