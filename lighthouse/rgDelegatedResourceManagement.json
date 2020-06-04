@@ -3,6 +3,12 @@
     "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "rgName": {
+            "type": "string",
+            "metadata": {
+                "description": "委任するリソースグループ名 (委任元のサブスクリプションに事前作成します)"
+            }
+        },
         "mspOfferName": {
             "type": "string",
             "defaultValue": "Fabrikam Managed Services - Interstellar",
@@ -42,12 +48,6 @@
             "metadata": {
                 "description": "委任先グループ、またはユーザーの表示名"
             }
-        },
-        "rgName": {
-            "type": "string",
-            "metadata": {
-                "description": "委任するリソースグループ名 (委任元のサブスクリプションに事前作成します)"
-            }
         }
     },
     "variables": {
@@ -63,11 +63,13 @@
                 "registrationDefinitionName": "[parameters('mspOfferName')]",
                 "description": "[parameters('mspOfferDescription')]",
                 "managedByTenantId": "[parameters('managedByTenantId')]",
-                "authorizations": {
-                    "principalId": "[parameters('assigneeId')]",
-                    "roleDefinitionId": "[parameters('assignedRole')]",
-                    "principalIdDisplayName": "[parameters('asigneeDiplayName')]"
-                }
+                "authorizations": [
+                    {
+                        "principalId": "[parameters('assigneeId')]",
+                        "roleDefinitionId": "[parameters('assignedRole')]",
+                        "principalIdDisplayName": "[parameters('asigneeDiplayName')]"
+                    }
+                ]
             }
         },
         {
@@ -107,11 +109,13 @@
         "authorizations": {
             "type": "array",
             "value": {
-                "authorizations": {
-                    "principalId": "[parameters('assigneeId')]",
-                    "roleDefinitionId": "[parameters('assignedRole')]",
-                    "principalIdDisplayName": "[parameters('asigneeDiplayName')]"
-                }
+                "authorizations": [
+                    {
+                        "principalId": "[parameters('assigneeId')]",
+                        "roleDefinitionId": "[parameters('assignedRole')]",
+                        "principalIdDisplayName": "[parameters('asigneeDiplayName')]"
+                    }
+                ]
             }
         }
     }
