@@ -20,6 +20,9 @@ Lighthouse を有効にし、自身をサブスクリプションの所有者に
 
 Msp Offer Name 等は適宜変更 (後からは変更できないっぽい)
 
+Assigned Role には [組み込みロール](https://docs.microsoft.com/ja-jp/azure/role-based-access-control/built-in-roles) のいずれかの ID を入れる。
+デフォルトは共同管理者 (Contributor: b24988ac-6180-42a0-ab88-20f7382dd24c)。
+
 ## 委任先テナントで確認
 
 委任先テナントに、権限を割り当てたグループ/ユーザーでサインインし、右上のアイコンをクリック
